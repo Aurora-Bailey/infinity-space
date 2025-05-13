@@ -1,2 +1,17 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script>
+	import { scanner } from '$lib/stores/scanner';
+</script>
+
+<svelte:head>
+	<title>Infinity Space</title>
+	<meta name="description" content="Infinity Space" />
+</svelte:head>
+
+<section class="flex flex-col items-center justify-center p-10">
+	<h1>✨ The future is neon ✨</h1>
+	<h2>press escape...</h2>
+	<p>{$scanner}</p>
+</section>
+
+<style>
+</style>

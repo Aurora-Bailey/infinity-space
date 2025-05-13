@@ -1,0 +1,135 @@
+@import 'tailwindcss';
+@import '@fontsource/fira-mono';
+
+:root {
+	--font-body: 'Fira Mono', monospace;
+	--font-mono: 'Fira Mono', monospace;
+
+	--color-bg-0: #0b0c10; /* deep dark */
+	--color-bg-1: #0d1117; /* github dark background */
+	--color-bg-2: #161b22; /* even deeper */
+
+	--color-theme-1: #66fcf1; /* neon cyan */
+	--color-theme-2: #45a29e; /* muted neon teal */
+
+	--color-text: #ffffff; /* soft white text */
+
+	--column-width: 42rem;
+	--column-margin-top: 4rem;
+
+	font-family: var(--font-body);
+	color: var(--color-text);
+}
+
+body {
+	min-height: 100vh;
+	margin: 0;
+	background-attachment: fixed;
+	background-color: var(--color-bg-1);
+	background-size: 100vw 100vh;
+	background-image:
+		radial-gradient(50% 50% at 50% 50%, rgba(102, 252, 241, 0.1) 0%, rgba(13, 17, 23, 0.5) 100%),
+		linear-gradient(180deg, var(--color-bg-0) 0%, var(--color-bg-1) 25%, var(--color-bg-2) 100%);
+}
+
+h1,
+h2,
+p {
+	font-weight: 400;
+}
+
+p {
+	line-height: 1.5;
+}
+
+a {
+	color: var(--color-theme-1);
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+a:hover {
+	color: var(--color-theme-2);
+	text-decoration: underline;
+}
+
+h1 {
+	font-size: 2rem;
+	text-align: center;
+	color: var(--color-theme-1);
+	text-shadow: 0 0 5px var(--color-theme-1);
+}
+
+h2 {
+	font-size: 1rem;
+	color: var(--color-theme-2);
+}
+
+pre {
+	font-size: 16px;
+	font-family: var(--font-mono);
+	background-color: rgba(102, 252, 241, 0.1);
+	border-radius: 6px;
+	box-shadow: 0 0 10px rgba(102, 252, 241, 0.25);
+	padding: 1em;
+	overflow-x: auto;
+	color: var(--color-text);
+}
+
+.text-column {
+	display: flex;
+	max-width: 48rem;
+	flex: 0.6;
+	flex-direction: column;
+	justify-content: center;
+	margin: 0 auto;
+	padding: 1rem;
+}
+
+input,
+button {
+	font-size: inherit;
+	font-family: inherit;
+	color: var(--color-text);
+	border-radius: 5px;
+	padding: 0.5rem 1rem;
+	transition: all 0.2s ease;
+	opacity: 0.7;
+}
+input {
+	background-color: var(--color-bg-2);
+}
+
+button {
+	cursor: pointer;
+}
+
+button:hover,
+input:hover {
+	opacity: 1;
+}
+
+button:focus:not(:focus-visible) {
+	outline: none;
+}
+
+@media (min-width: 720px) {
+	h1 {
+		font-size: 2.4rem;
+	}
+}
+
+.visually-hidden {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: auto;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	white-space: nowrap;
+}
+.rounded-full {
+	border-radius: 200px;
+}
