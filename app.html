@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/infinity-space/icons/icon-192x192.png" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+		/>
+		<meta name="mobile-web-app-capable" content="yes" />
+
+		<!-- SvelteKit -->
+		
+		<link rel="modulepreload" href="/infinity-space/internal/immutable/entry/start.BDnz29qC.js">
+		<link rel="modulepreload" href="/infinity-space/internal/immutable/chunks/B0T4yktn.js">
+		<link rel="modulepreload" href="/infinity-space/internal/immutable/chunks/C7EWuEMJ.js">
+		<link rel="modulepreload" href="/infinity-space/internal/immutable/chunks/BBipE6xF.js">
+		<link rel="modulepreload" href="/infinity-space/internal/immutable/chunks/CLjBRut9.js">
+		<link rel="modulepreload" href="/infinity-space/internal/immutable/entry/app.DafbIVxR.js">
+		<link rel="modulepreload" href="/infinity-space/internal/immutable/chunks/DwwRv1Xk.js">
+		<link rel="modulepreload" href="/infinity-space/internal/immutable/chunks/J3dmLmji.js">
+		<link rel="modulepreload" href="/infinity-space/internal/immutable/chunks/CaDkz3ZD.js">
+		<link rel="modulepreload" href="/infinity-space/internal/immutable/chunks/CE_Lb8p4.js">
+
+		<!-- PWA -->
+		<link rel="manifest" href="/infinity-space/manifest.json" />
+		<meta name="theme-color" content="#1e1e2f" />
+
+		<!-- iOS support -->
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-title" content="Scanner" />
+		<link rel="apple-touch-icon" href="/infinity-space/icons/icon-192x192.png" />
+	</head>
+
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">
+			<script>
+				{
+					__sveltekit_1vt9kfm = {
+						base: "/infinity-space",
+						assets: "/infinity-space"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/infinity-space/internal/immutable/entry/start.BDnz29qC.js"),
+						import("/infinity-space/internal/immutable/entry/app.DafbIVxR.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+				}
+			</script>
+		</div>
+
+		<script>
+			if ('serviceWorker' in navigator) {
+				window.addEventListener('load', () => {
+					navigator.serviceWorker
+						.register('/infinity-space/service-worker.js')
+						.then((reg) => console.log('Service Worker registered:', reg))
+						.catch((err) => console.error('Service Worker registration failed:', err));
+				});
+			}
+		</script>
+	</body>
+</html>
