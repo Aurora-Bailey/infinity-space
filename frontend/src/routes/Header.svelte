@@ -15,113 +15,12 @@
 	scanner.set('');
 
 	let actions = [
-		// Type: 'code'
 		{
-			name: 'List errors',
-			type: 'code',
-			fav: false,
-			ref: 'ls -la',
-			keywords: ['errors', 'list', 'code', 'ls', '-la']
-		},
-		{
-			name: 'Check disk space',
-			type: 'code',
-			fav: false,
-			ref: 'df -h',
-			keywords: ['disk', 'space', 'usage', 'df', 'storage']
-		},
-		{
-			name: 'Show processes',
-			type: 'code',
-			fav: false,
-			ref: 'top',
-			keywords: ['processes', 'cpu', 'usage', 'top', 'monitor']
-		},
-		{
-			name: 'Network config',
-			type: 'code',
-			fav: false,
-			ref: 'ifconfig',
-			keywords: ['network', 'ip', 'interface', 'ethernet']
-		},
-		{
-			name: 'System info',
-			type: 'code',
-			fav: true,
-			ref: 'uname -a',
-			keywords: ['system', 'kernel', 'version', 'uname']
-		},
-		{
-			name: 'Edit hosts file',
-			type: 'code',
-			fav: false,
-			ref: 'sudo nano /etc/hosts',
-			keywords: ['edit', 'hosts', 'nano', 'dns', 'file']
-		},
-		{
-			name: 'Search logs',
-			type: 'code',
-			fav: false,
-			ref: 'grep "error" /var/log/syslog',
-			keywords: ['logs', 'search', 'error', 'grep', 'syslog']
-		},
-		{
-			name: 'Update packages',
-			type: 'code',
-			fav: false,
-			ref: 'sudo apt update && sudo apt upgrade',
-			keywords: ['update', 'packages', 'upgrade', 'apt', 'linux']
-		},
-		{
-			name: 'Check memory',
-			type: 'code',
-			fav: false,
-			ref: 'free -m',
-			keywords: ['memory', 'ram', 'usage', 'free', 'megabytes']
-		},
-		{
-			name: 'Restart service',
-			type: 'code',
-			fav: false,
-			ref: 'sudo systemctl restart nginx',
-			keywords: ['restart', 'service', 'nginx', 'systemctl']
-		},
-
-		// Type: 'link'
-		{
-			name: 'Apple',
+			name: 'Home',
 			type: 'link',
 			fav: true,
-			ref: '/apple',
-			keywords: ['apple', 'fruit', 'tree', 'seeds', 'red']
-		},
-		{
-			name: 'Banana',
-			type: 'link',
-			fav: false,
-			ref: '/banana',
-			keywords: ['banana', 'fruit', 'yellow', 'peel', 'tropical']
-		},
-		{
-			name: 'Cherry',
-			type: 'link',
-			fav: false,
-			ref: '/cherry',
-			keywords: ['cherry', 'fruit', 'red', 'pit', 'tree']
-		},
-		{
-			name: 'Date',
-			type: 'link',
-			fav: false,
-			ref: '/date',
-			keywords: ['date', 'fruit', 'sweet', 'desert', 'palm']
-		},
-		{
-			name: 'Elderberry',
-			type: 'link',
-			fav: false,
-			ref: '/elderberry',
-			keywords: ['elderberry', 'fruit', 'purple', 'immune', 'berry']
+			ref: '/',
+			keywords: ['home', 'back', 'exit', 'reset', 'other']
 		},
 		{
 			name: 'QR',
@@ -131,18 +30,11 @@
 			keywords: ['qr', 'fruit', 'tree', 'sweet', 'seeds']
 		},
 		{
-			name: 'Sverdle',
+			name: 'QR Nav',
 			type: 'link',
 			fav: true,
-			ref: '/sverdle',
-			keywords: ['grape', 'fruit', 'vine', 'stem', 'purple']
-		},
-		{
-			name: 'Home',
-			type: 'link',
-			fav: true,
-			ref: '/',
-			keywords: ['home', 'back', 'exit', 'reset', 'other']
+			ref: '/qrnav',
+			keywords: ['qr', 'fruit', 'tree', 'sweet', 'seeds']
 		},
 		{
 			name: 'Import',
@@ -174,7 +66,7 @@
 			let k = e.key;
 
 			if (!capturing) {
-				if (k === 'Escape') toggle(false);
+				if (k === 'Escape') toggle(true);
 
 				if (hamburger && k >= '0' && k <= '9') {
 					e.preventDefault();
@@ -199,6 +91,7 @@
 
 			// Capture with bluetooth scanner
 			if (capturing && k === 'Enter') {
+				if (buffer[0] == "/") goto(`${base}${buffer}`);
 				scanner.set(buffer);
 				scancount.update((n) => n + 1);
 				capturing = false;
