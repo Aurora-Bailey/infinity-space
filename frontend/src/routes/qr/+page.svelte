@@ -48,8 +48,8 @@
 		labels = await Promise.all(
 			items.map(async (text) => {
 				const canvas = document.createElement('canvas');
-				canvas.width = 1440 / 4;
-				canvas.height = 960 / 4;
+				canvas.width = 1440 / 4; // resolution of barcode
+				canvas.height = 960 / 4.23;
 				const ctx = canvas.getContext('2d');
 				ctx.fillStyle = '#fff';
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -113,7 +113,7 @@
 	/>
 </svelte:head>
 
-<section class="text-white print:p-0 p-4">
+<section class="text-white p-0 m-auto max-w-[650px] print:w-[100%]">
 	<div class="print:hidden flex flex-wrap gap-4 mb-4">
 		<div class="flex w-[120px] flex-col">
 			<!-- svelte-ignore a11y_label_has_associated_control -->
@@ -156,13 +156,13 @@
 	</div>
 	<!-- Rendered Labels -->
 	<div
-		class="grid grid-cols-5 grid-rows-10 gap-0 w-[2550px/2] h-[3300px/2] print:w-[2550px] print:h-[3300px]"
+		class="grid grid-cols-5 gap-0 w-[100%] h-[100%]"
 	>
 		{#each labels as { dataUrl }, index (index)}
 			<img
 				src={dataUrl}
 				alt="Label {index}"
-				class="w-[100%] h-[100%] outline-2"
+				class="w-[100%] h-[100%] outline-1 print:outline-0"
 				class:outline-cyan-400={unique}
 				class:outline-red-700={!unique}
 			/>
