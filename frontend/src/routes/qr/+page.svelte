@@ -155,9 +155,7 @@
 		</button>
 	</div>
 	<!-- Rendered Labels -->
-	<div
-		class="grid grid-cols-5 gap-0 w-[100%] h-[100%]"
-	>
+	<div class="grid grid-cols-5 gap-0 w-[100%] h-[100%]">
 		{#each labels as { dataUrl }, index (index)}
 			<img
 				src={dataUrl}

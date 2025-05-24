@@ -1,7 +1,7 @@
 <script>
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { scanner, scancount } from '$lib/stores/scanner';
 
@@ -92,7 +92,7 @@
 			// Capture with bluetooth scanner
 			if (capturing && k === 'Enter') {
 				if (buffer[0] == "/") goto(`${base}${buffer}`);
-				scanner.set(buffer);
+				else scanner.set(buffer);
 				scancount.update((n) => n + 1);
 				capturing = false;
 				buffer = '';
@@ -119,7 +119,6 @@
 	async function toggle(expand) {
 		reset();
 		open = !open;
-		await tick(); // 🔥 wait for DOM update
 		if (expand) hamburger = true;
 		else {
 			const t = document.getElementById('nav-search');

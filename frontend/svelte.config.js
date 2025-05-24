@@ -8,7 +8,7 @@ const config = {
 		adapter: dev
 			? adapter()
 			: adapterStatic({
-					fallback: 'app.html' // SPA fallback for GitHub Pages
+					fallback: 'index.html' // SPA fallback for GitHub Pages
 				}),
 		paths: { base: dev ? '' : '/infinity-space' },
 		prerender: {
