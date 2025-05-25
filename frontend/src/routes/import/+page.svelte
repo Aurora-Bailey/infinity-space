@@ -29,9 +29,10 @@
 				hist = [...hist];
 				setTimeout(() => {
 					hist = hist.filter((entry) => entry.c !== newEntry.c);
+					hist = hist.filter((entry) => entry.scan !== newEntry.scan);
 				}, 6000);
 			} else {
-				const qr = await toDataURL($scanner, {
+				const qr = await toDataURL(newEntry.scan, {
 					errorCorrectionLevel: 'L',
 					margin: 2,
 					scale: 8,
