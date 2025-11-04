@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import { config } from './config.js';
 import uploadRouter from './routes/upload.js';
+import analyzeRouter from './routes/analyze.js';
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/import', uploadRouter);
+app.use('/api/analyze', analyzeRouter);
 
 app.use((req, res) => {
 	res.status(404).json({ message: 'Not found' });

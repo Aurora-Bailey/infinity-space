@@ -15,6 +15,11 @@ const parseOrigins = (value) => {
 		.filter(Boolean);
 };
 
+const resolveDynamoTable = () => {
+	const table = process.env.DYNAMO_TABLE_NAME ?? process.env.DYNAMODB_TABLE;
+	return required(table, 'DYNAMO_TABLE_NAME (or DYNAMODB_TABLE)');
+};
+
 export const config = {
 	port: Number(process.env.PORT ?? 4000),
 	awsRegion: required(process.env.AWS_REGION, 'AWS_REGION'),
@@ -22,5 +27,8 @@ export const config = {
 	keyPrefix: process.env.S3_KEY_PREFIX ?? '',
 	presignTtl: Number(process.env.S3_PRESIGN_TTL ?? 60),
 	allowedOrigins: parseOrigins(process.env.ALLOWED_ORIGINS),
-	maxUploadBytes: Number(process.env.MAX_UPLOAD_BYTES ?? 5_000_000)
+	maxUploadBytes: Number(process.env.MAX_UPLOAD_BYTES ?? 5_000_000),
+	openaiApiKey: required(process.env.OPENAI_API_KEY, 'OPENAI_API_KEY'),
+	openaiModel: process.env.OPENAI_MODEL ?? 'gpt-4.1-mini',
+	dynamoTable: resolveDynamoTable()
 };

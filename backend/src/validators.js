@@ -24,3 +24,19 @@ export const buildKey = ({ fileName }) => {
 	const prefix = config.keyPrefix;
 	return prefix ? `${prefix.replace(/\/?$/, '/')}${fileName}` : fileName;
 };
+
+export const analyzeRequestSchema = z.object({
+	key: z.string().min(1),
+	scan: z.string().min(1),
+	prompt: z.string().min(1).optional(),
+	camera: z.number().int().positive().optional(),
+	timestamp: timestampSchema.optional(),
+	contentType: z.string().min(1).optional(),
+	extra: z.record(z.unknown()).optional()
+});
+
+export const uploadCompleteSchema = analyzeRequestSchema.extend({
+	camera: z.number().int().positive(),
+	contentType: z.string().min(1),
+	timestamp: timestampSchema.optional()
+});

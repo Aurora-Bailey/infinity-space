@@ -11,6 +11,17 @@
 	const MAX_HISTORY = 10;
 	const uploadEndpoint = import.meta.env.VITE_UPLOAD_ENDPOINT ?? '/api/import';
 
+	const deriveAnalyzeEndpoint = () => {
+		if (import.meta.env.VITE_ANALYZE_ENDPOINT) return import.meta.env.VITE_ANALYZE_ENDPOINT;
+		const normalized = uploadEndpoint.replace(/\/+$/, '');
+		if (normalized.endsWith('/api/import')) {
+			return `${normalized}/complete`;
+		}
+		return `${normalized}/complete`;
+	};
+
+	const analyzeEndpoint = deriveAnalyzeEndpoint();
+
 	const sanitizeForFilename = (value) => {
 		if (!value) return '';
 		return value
@@ -40,7 +51,9 @@
 			fileName: `${baseName}_CAM${idx + 1}_${timestamp}.png`,
 			status: 'pending',
 			error: null,
-			url: null
+			url: null,
+			analysis: null,
+			analysisError: null
 		}));
 
 		const entry = {
@@ -110,12 +123,36 @@
 					}
 
 					const payload = await response.json();
+					const s3Key = payload.key ?? payload?.fields?.key;
+					if (!s3Key) {
+						throw new Error('Upload payload missing S3 object key');
+					}
+
 					upload.url = await performS3Upload(payload, blob, upload);
+					upload.status = 'analyzing';
+					upload.error = null;
+					hist = [...hist];
+
+					const analysisResult = await triggerAnalysis({
+						scan: entry.scan,
+						key: s3Key,
+						contentType: blob.type,
+						camera: upload.camera,
+						timestamp: entry.createdAt,
+						finalUrl: upload.url,
+						fileName: upload.fileName
+					});
+
 					upload.status = 'success';
 					upload.error = null;
+					upload.analysis = pruneUploadMeta(analysisResult);
+					upload.analysisError = null;
 				} catch (err) {
+					console.error('Upload pipeline error', err);
 					upload.status = 'error';
-					upload.error = err instanceof Error ? err.message : 'Upload failed';
+					const message = err instanceof Error ? err.message : 'Upload failed';
+					upload.error = message;
+					upload.analysisError = message;
 				} finally {
 					hist = [...hist];
 				}
@@ -159,7 +196,7 @@
 			return;
 		}
 
-		if (entry.uploads.some((u) => u.status === 'uploading')) {
+		if (entry.uploads.some((u) => u.status === 'uploading' || u.status === 'analyzing')) {
 			entry.status = 'uploading';
 		} else {
 			entry.status = 'pending';
@@ -212,6 +249,58 @@
 		}
 
 		throw new Error('Upload payload missing URL information');
+	};
+
+	const triggerAnalysis = async ({
+		scan,
+		key,
+		contentType,
+		camera,
+		timestamp,
+		finalUrl,
+		fileName
+	}) => {
+		const response = await fetch(analyzeEndpoint, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				scan,
+				key,
+				contentType,
+				camera,
+				timestamp,
+				extra: {
+					finalUrl,
+					fileName
+				}
+			})
+		});
+
+		if (!response.ok) {
+			const message = (await response.text()) || response.statusText;
+			console.error('Analysis request failed', message);
+			throw new Error(`Analysis failed: ${message}`);
+		}
+
+		return response.json();
+	};
+
+	const pruneUploadMeta = (analysisResult) => {
+		if (!analysisResult || typeof analysisResult !== 'object') return analysisResult;
+		const cleaned = { ...analysisResult };
+		if (cleaned.metadata) {
+			const { metadata } = cleaned;
+			cleaned.metadata = {
+				...metadata,
+				extra: metadata.extra?.fileName
+					? {
+							fileName: metadata.extra.fileName,
+							finalUrl: metadata.extra.finalUrl
+					  }
+					: metadata.extra
+			};
+		}
+		return cleaned;
 	};
 
 	const rotateCamera = (cameraObj) => {
@@ -315,8 +404,8 @@
 			stream: null,
 			videoEl: null,
 			active: false,
-			rotation: 0,
-			landscape: true,
+				rotation: 0,
+				landscape: true,
 			error: null
 		}));
 	});
@@ -391,7 +480,11 @@
 							{#if entry.status === 'pending'}
 								Awaiting upload...
 							{:else if entry.status === 'uploading'}
-								Uploading...
+								{#if entry.uploads.some((u) => u.status === 'analyzing')}
+									Analyzing...
+								{:else}
+									Uploading...
+								{/if}
 							{:else if entry.status === 'success'}
 								Uploaded
 							{:else}
@@ -407,11 +500,13 @@
 							<span class="text-xs text-white px-2">
 								CAM{upload.camera}: {upload.status === 'success'
 									? 'Uploaded'
-									: upload.status === 'uploading'
-										? 'Uploading...'
-										: upload.status === 'error'
-											? `Error${upload.error ? `: ${upload.error}` : ''}`
-											: 'Pending'}
+									: upload.status === 'analyzing'
+										? 'Analyzing...'
+										: upload.status === 'uploading'
+											? 'Uploading...'
+											: upload.status === 'error'
+												? `Error${upload.error ? `: ${upload.error}` : ''}`
+												: 'Pending'}
 							</span>
 							<span class="text-[10px] text-white/80 px-2">{upload.fileName}</span>
 						</div>
