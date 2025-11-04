@@ -91,7 +91,7 @@
 
 			// Capture with bluetooth scanner
 			if (capturing && k === 'Enter') {
-				if (buffer[0] == "/") goto(`${base}${buffer}`);
+				if (buffer[0] == '/') goto(`${base}${buffer}`);
 				else scanner.set(buffer);
 				scancount.update((n) => n + 1);
 				capturing = false;
