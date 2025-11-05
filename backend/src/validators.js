@@ -32,7 +32,8 @@ export const analyzeRequestSchema = z.object({
 	camera: z.number().int().positive().optional(),
 	timestamp: timestampSchema.optional(),
 	contentType: z.string().min(1).optional(),
-	extra: z.record(z.unknown()).optional()
+	extra: z.record(z.unknown()).optional(),
+	fileName: z.string().min(1).optional()
 });
 
 export const uploadCompleteSchema = analyzeRequestSchema.extend({

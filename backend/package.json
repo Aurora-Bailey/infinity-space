@@ -9,16 +9,17 @@
 		"lint": "eslint \"src/**/*.js\""
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "^3.744.0",
-		"@aws-sdk/s3-presigned-post": "^3.744.0",
 		"@aws-sdk/client-dynamodb": "^3.744.0",
+		"@aws-sdk/client-s3": "^3.744.0",
 		"@aws-sdk/lib-dynamodb": "^3.744.0",
+		"@aws-sdk/s3-presigned-post": "^3.744.0",
 		"cors": "^2.8.5",
 		"dotenv": "^16.4.5",
 		"express": "^4.21.2",
 		"helmet": "^7.1.0",
 		"morgan": "^1.10.0",
 		"openai": "^4.63.0",
+		"ws": "^8.18.3",
 		"zod": "^3.24.4"
 	},
 	"devDependencies": {

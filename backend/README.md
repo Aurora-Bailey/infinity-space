@@ -21,40 +21,65 @@ npm run dev
 The server listens on port `4000` by default and exposes:
 
 - `GET /health` — service health check  
-- `POST /api/import` — returns a pre-signed POST payload for uploading the captured image to S3
+- `WS /ws` — primary API (pre-sign, analysis, status streaming)
 
-## `POST /api/import`
+## WebSocket API
 
-### Request body
+All ingest operations happen over a single WebSocket connection. The backend streams status events so clients can show “uploading”, “running AI”, and “persisting to DynamoDB” heartbeats while long tasks run.
 
-```json
-{
-  "fileName": "BARCODE_CAM1_20240101T120000Z.png",
-  "contentType": "image/png",
-  "scan": "barcode payload",
-  "camera": 1,
-  "timestamp": 1704110400000
-}
-```
+### Connecting
 
-### Response
+1. Open `ws(s)://<host>/ws`. The server responds with a `ready` message followed by an optional `snapshot` of recent operations.
+2. The server periodically pings clients. Browsers reply automatically; no special handling is required.
+3. On reconnect, reissue the connection. The initial `snapshot` replays the latest statuses for any scans still in progress.
 
-```json
-{
-  "url": "https://your-bucket.s3.amazonaws.com",
-  "fields": {
-    "key": "uploads/BARCODE_CAM1_20240101T120000Z.png",
-    "...": "...",
-    "policy": "...",
-    "x-amz-signature": "..."
-  },
-  "finalUrl": "https://your-bucket.s3.amazonaws.com/uploads/BARCODE_CAM1_20240101T120000Z.png",
-  "expiresIn": 60,
-  "key": "uploads/BARCODE_CAM1_20240101T120000Z.png"
-}
-```
+### Client → Server messages
 
-The frontend should submit the provided `fields` (plus the binary file) to `url` using a `multipart/form-data` POST. The `finalUrl` indicates where the object will live after a successful upload.
+- `presign_request`
+
+  ```jsonc
+  {
+    "type": "presign_request",
+    "requestId": "uuid",
+    "payload": {
+      "scan": "H10011",
+      "fileName": "H10011_CAM1_20251104.png",
+      "contentType": "image/png",
+      "camera": 1,
+      "timestamp": 1730750160846
+    }
+  }
+  ```
+
+- `upload_complete`
+
+  ```jsonc
+  {
+    "type": "upload_complete",
+    "requestId": "uuid",
+    "payload": {
+      "scan": "H10011",
+      "fileName": "H10011_CAM1_20251104.png",
+      "key": "uploads/H10011_CAM1_20251104.png",
+      "contentType": "image/png",
+      "camera": 1,
+      "timestamp": 1730750160846,
+      "finalUrl": "https://hwab-photo.s3.us-west-2.amazonaws.com/uploads/H10011_CAM1_20251104.png"
+    }
+  }
+  ```
+
+- `analyze_request` — identical payload to `upload_complete`; use for manual re-runs.
+
+### Server → Client messages
+
+- `presign_response` — contains the form upload target (`url`, `fields`, `key`, `finalUrl`, `expiresIn`).
+- `analysis_result` — returns the normalized DynamoDB record produced by `analyzeAndStore`.
+- `status` — heartbeat updates (`presign.started`, `analysis.ai.request`, `analysis.db.success`, etc.) with `scan`, optional `fileName`, human-readable `message`, and ISO timestamp.
+- `snapshot` — replay of the most recent status events when a client connects or reconnects.
+- `error` — request-scoped failure with an explanatory message.
+
+Clients should queue outgoing messages until the socket reports `ready`, retry pending work after reconnect, and surface `status` updates in the UI so users always know which stage a scan is in.
 
 ## Environment variables
 
@@ -69,66 +94,6 @@ The frontend should submit the provided `fields` (plus the binary file) to `url`
 - `OPENAI_API_KEY` — OpenAI API key used for image analysis
 - `OPENAI_MODEL` — optional model override (defaults to `gpt-4.1-mini`)
 - `DYNAMODB_TABLE` (or legacy `DYNAMO_TABLE_NAME`) — DynamoDB table used to persist results (`id`/`scanId` is the partition key)
-
-## `POST /api/import/complete`
-
-Call this endpoint after S3 reports a successful upload to trigger analysis and persistence.
-
-```bash
-POST /api/import/complete
-{
-  "scan": "DS-11-B-04-2025",
-  "key": "uploads/DS_11_B_04_2025_2_CAM1.png",
-  "contentType": "image/png",
-  "camera": 1,
-  "timestamp": 1704110400000
-}
-```
-
-The backend downloads the image from S3, feeds it to OpenAI for comprehensive OCR/vision insights, and saves the structured result (with raw JSON and metadata) to DynamoDB under the provided `scan` id. The HTTP response mirrors what is stored.
-
-## `POST /api/analyze`
-
-Triggers the same workflow on demand (useful for re-runs or custom prompts). Provide the S3 key, the barcode scan id, and optionally override metadata.
-
-```bash
-POST /api/analyze
-{
-  "scan": "DS-11-B-04-2025",
-  "key": "uploads/DS_11_B_04_2025_2_CAM1.png",
-  "prompt": "Extract readable text and describe indicator lights.",
-  "camera": 1
-}
-```
-
-The response contains a structured analysis produced by the configured OpenAI model:
-
-```json
-{
-  "scan": "DS-11-B-04-2025",
-  "key": "uploads/…",
-  "model": "gpt-4.1-mini",
-  "analysis": {
-    "detected_text": [
-      { "text": "DS 11", "category": "label" },
-      { "text": "B 04", "category": "location" }
-    ],
-    "summary": "Scanner dashboard showing camera 1 online with green indicator.",
-    "dominant_colors": [
-      { "name": "teal", "hex": "#45A29E" }
-    ],
-    "objects": [
-      { "label": "Monitor", "confidence": 0.82, "attributes": ["status screen"] }
-    ],
-    "vehicle_insights": [],
-    "warnings": [
-      "Upload failed banner visible"
-    ]
-  },
-  "raw": "{\"detected_text\":…}",
-  "responseId": "resp_abc123"
-}
-```
 
 ## HWAB Inventory Data Model
 
