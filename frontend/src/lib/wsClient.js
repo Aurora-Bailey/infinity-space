@@ -109,7 +109,10 @@ const scheduleReconnect = () => {
 
 export const connect = () => {
 	if (typeof window === 'undefined') return;
-	if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+	if (
+		socket &&
+		(socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)
+	) {
 		return;
 	}
 
@@ -160,7 +163,7 @@ export const sendRequest = (type, payload = {}, { timeout = 120000 } = {}) =>
 			return;
 		}
 
-	const requestId = getRequestId();
+		const requestId = getRequestId();
 		const message = { type, requestId, payload };
 
 		const timeoutId = window.setTimeout(() => {
