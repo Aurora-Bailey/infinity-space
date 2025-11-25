@@ -1,0 +1,15 @@
+Database
+    Item
+        *WID: text 32 (Unique Warehouse ID)
+        ?MID: text 32 (Model ID) // hotwheels code or item barcode
+        ?front: text 32 (S3 Image Location)
+        ?front_t: text 32
+        ?front_s: text 32
+        ?front_m: text 32
+        ?front_l: text 32
+        ?back: text 32 (S3 Image Location)
+        ?back_t: text 32
+        ?back_s: text 32
+        ?back_m: text 32
+        ?back_l: text 32
+        

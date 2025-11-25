@@ -10,10 +10,13 @@
 	export let getVisionTextStyle;
 
 	let videoEl;
+	let hasSufficientText = false;
 
 	$: if (camera) {
 		camera.videoEl = videoEl;
 	}
+
+	$: hasSufficientText = Boolean(camera?.vision?.lastText?.trim().length > 4);
 </script>
 
 <div class="flex flex-col items-center gap-2">
@@ -35,8 +38,8 @@
 			{#if getVisionRectStyle(camera)}
 				<div
 					class="absolute pointer-events-none border-2 transition-colors duration-100"
-					class:border-green-500={camera.vision.highlightActive}
-					class:border-red-500={!camera.vision.highlightActive}
+					class:border-green-500={hasSufficientText}
+					class:border-red-500={!hasSufficientText}
 					style={getVisionRectStyle(camera)}
 				></div>
 				<div

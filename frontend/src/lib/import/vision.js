@@ -43,6 +43,8 @@ const VISION_HIGHLIGHT_MS = 100;
 const MIN_CONFIDENCE = 60;
 const UPSCALE_MIN_WIDTH = 96;
 const UPSCALE_MIN_HEIGHT = 48;
+const DEFAULT_REGION_WIDTH = 300;
+const DEFAULT_REGION_HEIGHT = 100;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -84,8 +86,8 @@ export const createVisionState = (name = 'Vision Region') => ({
 	region: {
 		x: 0,
 		y: 0,
-		width: 640,
-		height: 200
+		width: DEFAULT_REGION_WIDTH,
+		height: DEFAULT_REGION_HEIGHT
 	},
 	lastText: '',
 	lastUpdated: 0,
@@ -108,7 +110,8 @@ export const createVisionState = (name = 'Vision Region') => ({
 	cancelLoop: false,
 	frameWidth: 0,
 	frameHeight: 0,
-	buffers: createVisionBuffers()
+	buffers: createVisionBuffers(),
+	autoPositioned: false
 });
 
 const applyVisionEnhancements = (ctx, width, height, options = {}) => {
@@ -533,6 +536,7 @@ const handleVisionToggleInternal = (cameraObj, enabled, startLoop, stopLoop, ref
 	vision.lastConfidence = 0;
 	vision.candidateText = '';
 	vision.candidateCount = 0;
+	vision.autoPositioned = false;
 
 	if (!enabled) {
 		stopLoop(cameraObj);
@@ -609,6 +613,7 @@ export const createVisionController = ({ recognizeCanvas, refresh }) => {
 	const startLoop = (cameraObj) => startVisionLoopInternal(cameraObj, recognizeCanvas, doRefresh);
 	const stopLoop = (cameraObj) => stopVisionLoopInternal(cameraObj, doRefresh);
 	const ensureLoop = (cameraObj) => ensureVisionLoopInternal(cameraObj, startLoop, stopLoop);
+	const initializeRegion = (cameraObj) => applyInitialRegionPosition(cameraObj, doRefresh);
 
 	return {
 		createState: createVisionState,
@@ -622,8 +627,37 @@ export const createVisionController = ({ recognizeCanvas, refresh }) => {
 		startLoop,
 		stopLoop,
 		ensureLoop,
-		onVideoReady: ensureLoop,
+		onVideoReady: (cameraObj) => {
+			initializeRegion(cameraObj);
+			ensureLoop(cameraObj);
+		},
 		getRectStyle: getVisionRectStyle,
-		getTextStyle: getVisionTextStyle
+		getTextStyle: getVisionTextStyle,
+		initializeRegion
 	};
+};
+/**
+ * @param {import('./cameras.js').CameraDescriptor} cameraObj
+ * @param {() => void} refresh
+ */
+const applyInitialRegionPosition = (cameraObj, refresh) => {
+	const vision = cameraObj?.vision;
+	if (!vision || vision.autoPositioned) return;
+	const video = cameraObj?.videoEl;
+	if (!video || !video.videoWidth || !video.videoHeight) return;
+
+	const rotation = cameraObj.rotation ?? 0;
+	const frameWidth = rotation % 180 === 0 ? video.videoWidth : video.videoHeight;
+
+	if (!vision.region.width) {
+		vision.region.width = DEFAULT_REGION_WIDTH;
+	}
+	if (!vision.region.height) {
+		vision.region.height = DEFAULT_REGION_HEIGHT;
+	}
+
+	vision.region.x = Math.max(0, Math.round((frameWidth - vision.region.width) / 2));
+	vision.region.y = 0;
+	vision.autoPositioned = true;
+	refresh();
 };
