@@ -1,6 +1,47 @@
 Database
+    addresses
+        AID:
+        UID:
+        first:
+        last:
+        phone:
+        email:
+        country:
+        city:
+        state:
+        zip:
+        address:
+        notify_text: bool
+        notify_email: bool
+
+    user
+        UID: // user id
+        first:
+        last:
+        email:
+        phone:
+
+    photo
+        PID: 
+        ?front: text 32 (S3 Image Location)
+        ?front_t: text 32
+        ?front_s: text 32
+        ?front_m: text 32
+        ?front_l: text 32
+        ?back: text 32 (S3 Image Locatio)
+        ?back_t: text 32
+        ?back_s: text 32
+        ?back_m: text 32
+        ?back_l: text 32
+        ?other: text 32 (S3 Image Locatio)
+        ?other_t: text 32
+        ?other_s: text 32
+        ?other_m: text 32
+        ?other_l: text 32
+
     model
         *MID: text 32
+        *PID:
         *title: text 64
         *description: text 512
         *keywords: array
@@ -11,28 +52,17 @@ Database
         *inventory: array
         *sale_log: array
         *mutation_log: array
-        *images: object
-            ?front: text 32 (S3 Image Location)
-            ?front_t: text 32
-            ?front_s: text 32
-            ?front_m: text 32
-            ?front_l: text 32
-            ?back: text 32 (S3 Image Locatio)
-            ?back_t: text 32
-            ?back_s: text 32
-            ?back_m: text 32
-            ?back_l: text 32
-            ?other: text 32 (S3 Image Locatio)
-            ?other_t: text 32
-            ?other_s: text 32
-            ?other_m: text 32
-            ?other_l: text 32
        timestamp: UNIX TIMESTAMP 
+    bin
+        *BID:
+        name: "D-32", "UID-st8d6fpr", "tracking-8wfdar"
+        contents: [WID, WID]
     item
         *WID: text 32 (Unique Warehouse ID)
         *UID: text 32 (User id/ Owner id)
         *BID: text 32 (Bin id) // 0 for limbo
         *MID: text 32 (Model ID) // hotwheels code or item barcode
+        *PID: // photo id
         *condition: int (1-10)
         *certified: boolean
         *cert_notes: text 512
@@ -46,22 +76,5 @@ Database
             add_time: 10,000 // add time to auction after every bid
             bid_arr: obj array
                 [UID: text, bid: float, time: UNIX]
-
-        *images: object
-            ?front: text 32 (S3 Image Location)
-            ?front_t: text 32
-            ?front_s: text 32
-            ?front_m: text 32
-            ?front_l: text 32
-            ?back: text 32 (S3 Image Locatio)
-            ?back_t: text 32
-            ?back_s: text 32
-            ?back_m: text 32
-            ?back_l: text 32
-            ?other: text 32 (S3 Image Locatio)
-            ?other_t: text 32
-            ?other_s: text 32
-            ?other_m: text 32
-            ?other_l: text 32
        timestamp: UNIX TIMESTAMP 
         
