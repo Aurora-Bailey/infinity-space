@@ -1,15 +1,67 @@
 Database
-    Item
+    model
+        *MID: text 32
+        *title: text 64
+        *description: text 512
+        *keywords: array
+        *price_low: float
+        *price_high: float
+        *price_median: float
+        *quantity: int
+        *inventory: array
+        *sale_log: array
+        *mutation_log: array
+        *images: object
+            ?front: text 32 (S3 Image Location)
+            ?front_t: text 32
+            ?front_s: text 32
+            ?front_m: text 32
+            ?front_l: text 32
+            ?back: text 32 (S3 Image Locatio)
+            ?back_t: text 32
+            ?back_s: text 32
+            ?back_m: text 32
+            ?back_l: text 32
+            ?other: text 32 (S3 Image Locatio)
+            ?other_t: text 32
+            ?other_s: text 32
+            ?other_m: text 32
+            ?other_l: text 32
+       timestamp: UNIX TIMESTAMP 
+    item
         *WID: text 32 (Unique Warehouse ID)
-        ?MID: text 32 (Model ID) // hotwheels code or item barcode
-        ?front: text 32 (S3 Image Location)
-        ?front_t: text 32
-        ?front_s: text 32
-        ?front_m: text 32
-        ?front_l: text 32
-        ?back: text 32 (S3 Image Location)
-        ?back_t: text 32
-        ?back_s: text 32
-        ?back_m: text 32
-        ?back_l: text 32
+        *UID: text 32 (User id/ Owner id)
+        *BID: text 32 (Bin id) // 0 for limbo
+        *MID: text 32 (Model ID) // hotwheels code or item barcode
+        *condition: int (1-10)
+        *certified: boolean
+        *cert_notes: text 512
+        *keywords: array[text] (AI gen keywords)
+        *price: float (list for sale) // 0 for nfs
+        *mutation_log: array
+        *auction: object
+            active: bool
+            start_time: UNIX TIME
+            end_time: UNIX TIME
+            add_time: 10,000 // add time to auction after every bid
+            bid_arr: obj array
+                [UID: text, bid: float, time: UNIX]
+
+        *images: object
+            ?front: text 32 (S3 Image Location)
+            ?front_t: text 32
+            ?front_s: text 32
+            ?front_m: text 32
+            ?front_l: text 32
+            ?back: text 32 (S3 Image Locatio)
+            ?back_t: text 32
+            ?back_s: text 32
+            ?back_m: text 32
+            ?back_l: text 32
+            ?other: text 32 (S3 Image Locatio)
+            ?other_t: text 32
+            ?other_s: text 32
+            ?other_m: text 32
+            ?other_l: text 32
+       timestamp: UNIX TIMESTAMP 
         
